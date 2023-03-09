@@ -6,6 +6,17 @@ import pandas as pd
 # data = np.genfromtxt('t.txt', dtype=int, encoding=None,delimiter=",")
 data = pd.read_csv('t.txt', header = None)
 
+#helper methods:
+def splitter(D, index, value):
+    D_y = []
+    D_n = []
+    for i in range(len(D[index])):
+        if (D[index][i] >= value):
+            D_y.append(D.iloc[i])
+        else:
+            D_n.append(D.iloc[i])
+    return (D_y, D_n)
+
 def wholeset_entropy(D, index):
     D_y = []
     D_n = []
@@ -15,8 +26,10 @@ def wholeset_entropy(D, index):
         else:
             D_n.append(D[index][i])
     whole_set_entropy = -(((len(D_y) / len(D)) * math.log2(len(D_y) / len(D)) + (len(D_n) / len(D)) * math.log2(len(D_n) / len(D))))
-    return whole_set_entropy
+    Gini_index = 1 - (math.pow(((len(D_y) / len(D))), 2)) - (math.pow(((len(D_n) / len(D))), 2))
+    return (whole_set_entropy,Gini_index)
 
+#given methods
 def IG(D, index, value):
     """Compute the Information Gain of a split on attribute index at value
     for dataset D.
@@ -29,25 +42,20 @@ def IG(D, index, value):
     Returns:
         The value of the Information Gain for the given split
     """
-    D_y = []
-    D_n = []
-    for i in range(len(D)):
-        if (D[index][i] >= value):
-            D_y.append(D.iloc[i])
-        else:
-            D_n.append(D.iloc[i])
-    print("after split: D_y -- \n", pd.DataFrame(D_y))
+    D_y = splitter(D,index, value)[0]
+    D_n = splitter(D,index, value)[0]
+    print("after split: D_y -- \n", pd.DataFrame(splitter(D,index, value)[0]))
     print()
-    print("after split: D_n -- \n", pd.DataFrame(D_n))
+    print("after split: D_n -- \n", pd.DataFrame(splitter(D,index, value)[1]))
 
-    entropy_divide = (len(D_y)/len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index) + (len(D_n)/len(D))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)
-    IG = wholeset_entropy(D, index) - entropy_divide
+    entropy_divide = (len(D_y)/len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[0] + (len(D_n)/len(D))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[0]
+    IG = wholeset_entropy(D, index)[0] - entropy_divide
     print()
     print("found information gain: ", IG)
     return IG
 
-IG(data,1,28)
-
+#testing
+IG(data, 1, 28)
 
 def G(D, index, value):
     """Compute the Gini index of a split on attribute index at value
@@ -61,6 +69,15 @@ def G(D, index, value):
     Returns:
         The value of the Gini index for the given split
     """
+    D_y = splitter(D, index, value)[0]
+    D_n = splitter(D, index, value)[1]
+
+    gini_index = (len(D_y)/len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[1] + (len(D_n)/len(D))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[1]
+    print("calculated gini index: ", gini_index)
+    return gini_index
+
+#testing
+G(data, 1, 28)
 
 
 def CART(D, index, value):
