@@ -25,9 +25,11 @@ def wholeset_entropy(D, index):
             D_y.append(D[index][i])
         else:
             D_n.append(D[index][i])
+
     whole_set_entropy = -(((len(D_y) / len(D)) * math.log2(len(D_y) / len(D)) + (len(D_n) / len(D)) * math.log2(len(D_n) / len(D))))
     Gini_index = 1 - (math.pow(((len(D_y) / len(D))), 2)) - (math.pow(((len(D_n) / len(D))), 2))
-    return (whole_set_entropy,Gini_index)
+    prob_difference = math.fabs(((len(D_y) / len(D))) - ((len(D_n) / len(D))))
+    return (whole_set_entropy,Gini_index, prob_difference)
 
 #given methods
 def IG(D, index, value):
@@ -92,7 +94,14 @@ def CART(D, index, value):
     Returns:
         The value of the CART measure for the given split
     """
+    D_y = splitter(D,index,value)[0]
+    D_n = splitter(D,index,value)[1]
+    cart = 2 * (len(D_y)/len(D)) * (len(D_n)/len(D)) * (wholeset_entropy(D,index)[2])
+    print("Cart measure: ", cart)
+    return cart
 
+#testing
+CART(data,1,28)
 
 def bestSplit(D, criterion):
     """Computes the best split for dataset D using the specified criterion
