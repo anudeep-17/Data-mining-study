@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 
 # data = np.genfromtxt('t.txt', dtype=int, encoding=None,delimiter=",")
-data = pd.read_csv('t.txt', header = None)
 
 #helper methods:
 def splitter(D, index, value):
@@ -26,9 +25,17 @@ def wholeset_entropy(D, index):
         else:
             D_n.append(D[index][i])
 
-    whole_set_entropy = -(((len(D_y) / len(D)) * math.log2(len(D_y) / len(D)) + (len(D_n) / len(D)) * math.log2(len(D_n) / len(D))))
+    if len(D_y) != 0 and len(D_n) != 0:
+        whole_set_entropy = -(((len(D_y) / len(D)) * math.log2(len(D_y) / len(D)) + (len(D_n) / len(D)) * math.log2(len(D_n) / len(D))))
+    elif len(D_y) == 0 and len(D_n) != 0:
+        whole_set_entropy = -((0 + (len(D_n) / len(D)) * math.log2(len(D_n) / len(D))))
+    elif len(D_y) != 0 and len(D_n) == 0:
+        whole_set_entropy = -((0 + (len(D_y) / len(D)) * math.log2(len(D_y) / len(D))))
+
     Gini_index = 1 - (math.pow(((len(D_y) / len(D))), 2)) - (math.pow(((len(D_n) / len(D))), 2))
+
     prob_difference = math.fabs(((len(D_y) / len(D))) - ((len(D_n) / len(D))))
+
     return (whole_set_entropy,Gini_index, prob_difference)
 
 #given methods
@@ -46,14 +53,14 @@ def IG(D, index, value):
     """
     D_y = splitter(D,index, value)[0]
     D_n = splitter(D,index, value)[0]
-    print("after split: D_y -- \n", pd.DataFrame(splitter(D,index, value)[0]))
-    print()
-    print("after split: D_n -- \n", pd.DataFrame(splitter(D,index, value)[1]))
+    # print("after split: D_y -- \n", pd.DataFrame(splitter(D,index, value)[0]))
+    # print()
+    # print("after split: D_n -- \n", pd.DataFrame(splitter(D,index, value)[1]))
 
     entropy_divide = (len(D_y)/len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[0] + (len(D_n)/len(D))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[0]
     IG = wholeset_entropy(D, index)[0] - entropy_divide
-    print()
-    print("found information gain: ", IG)
+    # print()
+    # print("found information gain: ", IG)
     return IG
 
 #testing
@@ -75,7 +82,7 @@ def G(D, index, value):
     D_n = splitter(D, index, value)[1]
 
     gini_index = (len(D_y)/len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[1] + (len(D_n)/len(D))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[1]
-    print("calculated gini index: ", gini_index)
+    # print("calculated gini index: ", gini_index)
     return gini_index
 
 #testing
@@ -97,7 +104,7 @@ def CART(D, index, value):
     D_y = splitter(D,index,value)[0]
     D_n = splitter(D,index,value)[1]
     cart = 2 * (len(D_y)/len(D)) * (len(D_n)/len(D)) * (wholeset_entropy(D,index)[2])
-    print("Cart measure: ", cart)
+    # print("Cart measure: ", cart)
     return cart
 
 #testing
@@ -115,32 +122,41 @@ def bestSplit(D, criterion):
     """
     correspondingsplits = {}
 
-    if(criterion.lower() == "IG"):
+    if(criterion.upper() == "IG"):
         print('chosen : IG')
-        for i in D.columns():
-            uniques = D[i].unique().sort()
+        print()
+        for i in D.columns[:10]:
+            uniques = D[i].unique()
             for j in uniques:
-                correspondingsplits[IG(D, i, j)] = IG(D, i, j)
+                correspondingsplits[IG(D, i, j)] = (i,j)
         print("largest Information gain found: " , max(correspondingsplits), "with the attribute and value being", correspondingsplits.get(max(correspondingsplits)))
         return correspondingsplits.get(max(correspondingsplits))
 
-    elif (criterion.lower() == "GINI"):
+    elif (criterion.upper() == "GINI"):
+        print()
         print('chosen : GINI')
-        for i in D.columns():
-            uniques = D[i].unique().sort()
+        print()
+
+        for i in D.columns[:10]:
+            uniques = D[i].unique()
             for j in uniques:
-                correspondingsplits[G(D, i, j)] = G(D, i, j)
+                correspondingsplits[G(D, i, j)] = (i,j)
         print("smallest GINI found: ", min(correspondingsplits), "with the attribute and value being", correspondingsplits.get(min(correspondingsplits)))
         return correspondingsplits.get(min(correspondingsplits))
 
-    elif (criterion.lower() == "CART"):
+    elif (criterion.upper() == "CART"):
+        print()
         print('chosen: CART')
-        for i in D.columns():
-            uniques = D[i].unique().sort()
+        print()
+
+        for i in D.columns[:10]:
+            uniques = D[i].unique()
             for j in uniques:
                 correspondingsplits[CART(D, i, j)] = (i,j)
         print("largest CART found: ", max(correspondingsplits), "with the attribute and value being", correspondingsplits.get(max(correspondingsplits)))
         return correspondingsplits.get(max(correspondingsplits))
+    else:
+        return (-1,-1)
 
 
 
@@ -159,7 +175,20 @@ def load(filename):
         where X[i] comes from the i-th row in filename; y is a list or ndarray of
         the classes of the observations, in the same order
     """
+    data = pd.read_csv(filename, header=None)
+    print("whole data: \n", data)
+    print()
+    best_IG = bestSplit(data, "IG")
+    # best_GINI = bestSplit(data, "GINI")
+    best_CART = bestSplit(data, "CART")
+    print()
+    print("---------overall info----------")
+    print("best IG at : ", best_IG)
+    # print("best GINI at : ", best_GINI)
+    print("best CART at : ", best_CART)
 
+#testing
+load('t.txt')
 
 def classifyIG(train, test):
     """Builds a single-split decision tree using the Information Gain criterion
