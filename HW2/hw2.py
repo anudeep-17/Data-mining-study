@@ -57,7 +57,7 @@ def IG(D, index, value):
     return IG
 
 #testing
-IG(data, 1, 28)
+# IG(data, 1, 28)
 
 def G(D, index, value):
     """Compute the Gini index of a split on attribute index at value
@@ -79,7 +79,7 @@ def G(D, index, value):
     return gini_index
 
 #testing
-G(data, 1, 28)
+# G(data, 1, 28)
 
 
 def CART(D, index, value):
@@ -101,7 +101,7 @@ def CART(D, index, value):
     return cart
 
 #testing
-CART(data,1,28)
+# CART(data,1,28)
 
 def bestSplit(D, criterion):
     """Computes the best split for dataset D using the specified criterion
@@ -113,6 +113,35 @@ def bestSplit(D, criterion):
     Returns:
         A tuple (i, value) where i is the index of the attribute to split at value
     """
+    correspondingsplits = {}
+
+    if(criterion.lower() == "IG"):
+        print('chosen : IG')
+        for i in D.columns():
+            uniques = D[i].unique().sort()
+            for j in uniques:
+                correspondingsplits[IG(D, i, j)] = IG(D, i, j)
+        print("largest Information gain found: " , max(correspondingsplits), "with the attribute and value being", correspondingsplits.get(max(correspondingsplits)))
+        return correspondingsplits.get(max(correspondingsplits))
+
+    elif (criterion.lower() == "GINI"):
+        print('chosen : GINI')
+        for i in D.columns():
+            uniques = D[i].unique().sort()
+            for j in uniques:
+                correspondingsplits[G(D, i, j)] = G(D, i, j)
+        print("smallest GINI found: ", min(correspondingsplits), "with the attribute and value being", correspondingsplits.get(min(correspondingsplits)))
+        return correspondingsplits.get(min(correspondingsplits))
+
+    elif (criterion.lower() == "CART"):
+        print('chosen: CART')
+        for i in D.columns():
+            uniques = D[i].unique().sort()
+            for j in uniques:
+                correspondingsplits[CART(D, i, j)] = (i,j)
+        print("largest CART found: ", max(correspondingsplits), "with the attribute and value being", correspondingsplits.get(max(correspondingsplits)))
+        return correspondingsplits.get(max(correspondingsplits))
+
 
 
 # functions are first class objects in python, so let's refer to our desired criterion by a single name
