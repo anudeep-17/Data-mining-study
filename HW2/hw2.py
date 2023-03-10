@@ -27,8 +27,10 @@ def wholeset_entropy(D, index):
 
     if len(D_y) != 0 and len(D_n) != 0:
         whole_set_entropy = -(((len(D_y) / len(D)) * math.log2(len(D_y) / len(D)) + (len(D_n) / len(D)) * math.log2(len(D_n) / len(D))))
+
     elif len(D_y) == 0 and len(D_n) != 0:
         whole_set_entropy = -((0 + (len(D_n) / len(D)) * math.log2(len(D_n) / len(D))))
+
     elif len(D_y) != 0 and len(D_n) == 0:
         whole_set_entropy = -((0 + (len(D_y) / len(D)) * math.log2(len(D_y) / len(D))))
 
@@ -81,7 +83,15 @@ def G(D, index, value):
     D_y = splitter(D, index, value)[0]
     D_n = splitter(D, index, value)[1]
 
-    gini_index = (len(D_y)/len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[1] + (len(D_n)/len(D))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[1]
+    if len(D_y) != 0 and len(D_n) != 0:
+        gini_index = (len(D_y) / len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True), index)[1] + (len(D_n) / len(D)) * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True), index)[1]
+
+    elif len(D_y) != 0 and len(D_n) == 0:
+        gini_index = (len(D_y) / len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True), index)[1]
+
+    elif len(D_y) == 0 and len(D_n) != 0:
+        gini_index = (len(D_n) / len(D)) * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True), index)[1]
+
     # print("calculated gini index: ", gini_index)
     return gini_index
 
@@ -139,6 +149,7 @@ def bestSplit(D, criterion):
 
         for i in D.columns[:10]:
             uniques = D[i].unique()
+            # print(uniques)
             for j in uniques:
                 correspondingsplits[G(D, i, j)] = (i,j)
         print("smallest GINI found: ", min(correspondingsplits), "with the attribute and value being", correspondingsplits.get(min(correspondingsplits)))
@@ -179,16 +190,16 @@ def load(filename):
     print("whole data: \n", data)
     print()
     best_IG = bestSplit(data, "IG")
-    # best_GINI = bestSplit(data, "GINI")
+    best_GINI = bestSplit(data, "GINI")
     best_CART = bestSplit(data, "CART")
     print()
     print("---------overall info----------")
     print("best IG at : ", best_IG)
-    # print("best GINI at : ", best_GINI)
+    print("best GINI at : ", best_GINI)
     print("best CART at : ", best_CART)
 
 #testing
-load('t.txt')
+load('train.txt')
 
 def classifyIG(train, test):
     """Builds a single-split decision tree using the Information Gain criterion
