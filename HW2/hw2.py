@@ -10,17 +10,21 @@ def splitter(D, index, value):
     D_y = []
     D_n = []
     for i in range(len(D[index])):
-        if (D[index][i] >= value):
+        if (D[index][i] <= value):
             D_y.append(D.iloc[i])
         else:
             D_n.append(D.iloc[i])
     return (D_y, D_n)
 
 def wholeset_entropy(D, index):
+    if len(D) == 0:
+        return (0,0,0)
+
     D_y = []
     D_n = []
+    # print(len(D[index]))
     for i in range(len(D[index])):
-        if (D[10][i] >= 1):
+        if (D[10][i] == 1):
             D_y.append(D[index][i])
         else:
             D_n.append(D[index][i])
@@ -36,7 +40,9 @@ def wholeset_entropy(D, index):
 
     Gini_index = 1 - (math.pow(((len(D_y) / len(D))), 2)) - (math.pow(((len(D_n) / len(D))), 2))
 
+    # print(len(D_n))
     prob_difference = math.fabs(((len(D_y) / len(D))) - ((len(D_n) / len(D))))
+    # print(prob_difference)
 
     return (whole_set_entropy,Gini_index, prob_difference)
 
@@ -54,19 +60,20 @@ def IG(D, index, value):
         The value of the Information Gain for the given split
     """
     D_y = splitter(D,index, value)[0]
-    D_n = splitter(D,index, value)[0]
+    D_n = splitter(D,index, value)[1]
+    # print(len(D_y), len(D_n))
     # print("after split: D_y -- \n", pd.DataFrame(splitter(D,index, value)[0]))
     # print()
     # print("after split: D_n -- \n", pd.DataFrame(splitter(D,index, value)[1]))
 
     entropy_divide = (len(D_y)/len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[0] + (len(D_n)/len(D))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[0]
     IG = wholeset_entropy(D, index)[0] - entropy_divide
-    # print()
+    # print(entropy_divide)
     # print("found information gain: ", IG)
     return IG
 
 #testing
-# IG(data, 1, 28)
+# IG(data, 0, 1)
 
 def G(D, index, value):
     """Compute the Gini index of a split on attribute index at value
@@ -113,7 +120,8 @@ def CART(D, index, value):
     """
     D_y = splitter(D,index,value)[0]
     D_n = splitter(D,index,value)[1]
-    cart = 2 * (len(D_y)/len(D)) * (len(D_n)/len(D)) * (wholeset_entropy(D,index)[2])
+    # print(len(D_y), len(D_n))
+    cart = 2 * (len(D_y)/len(D)) * (len(D_n)/len(D)) * (wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[2] + wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[2])
     # print("Cart measure: ", cart)
     return cart
 
@@ -189,6 +197,7 @@ def load(filename):
     data = pd.read_csv(filename, header=None)
     print("whole data: \n", data)
     print()
+    # print(CART(data,0,1))
     best_IG = bestSplit(data, "IG")
     best_GINI = bestSplit(data, "GINI")
     best_CART = bestSplit(data, "CART")
@@ -197,9 +206,12 @@ def load(filename):
     print("best IG at : ", best_IG)
     print("best GINI at : ", best_GINI)
     print("best CART at : ", best_CART)
+    return (data, best_IG, best_GINI, best_CART)
 
 #testing
-load('train.txt')
+# load('train.txt')
+
+best_IG_fortrain = load('train.txt')
 
 def classifyIG(train, test):
     """Builds a single-split decision tree using the Information Gain criterion
@@ -212,7 +224,18 @@ def classifyIG(train, test):
     Returns:
         A list of predicted classes for observations in test (in order)
     """
+    data = pd.read_csv(test, header=None)
+    # print(best_IG_fortrain[1])
+    test_split = splitter(data, best_IG_fortrain[1][0], best_IG_fortrain[1][1])
+    print()
+    print("-------------------classification of IG------------------")
+    print(pd.DataFrame(test_split[0]))
+    print()
+    print()
+    print(pd.DataFrame(test_split[1]))
+    # return
 
+# classifyIG('train.txt', 'test.txt')
 
 def classifyG(train, test):
     """Builds a single-split decision tree using the GINI criterion
@@ -225,7 +248,16 @@ def classifyG(train, test):
     Returns:
         A list of predicted classes for observations in test (in order)
     """
+    data = pd.read_csv(test, header=None)
+    test_split = splitter(data, best_IG_fortrain[2][0], best_IG_fortrain[2][1])
+    print()
+    print("-------------------classification of G------------------")
+    print(pd.DataFrame(test_split[0]))
+    print()
+    print()
+    print(pd.DataFrame(test_split[1]))
 
+# classifyG('train.txt', 'test.txt')
 
 def classifyCART(train, test):
     """Builds a single-split decision tree using the CART criterion
@@ -238,7 +270,17 @@ def classifyCART(train, test):
     Returns:
         A list of predicted classes for observations in test (in order)
     """
+    data = pd.read_csv(test, header=None)
+    # print(best_IG_fortrain[1])
+    test_split = splitter(data, best_IG_fortrain[3][0], best_IG_fortrain[3][1])
+    print()
+    print("-------------------classification of CART------------------")
+    print(pd.DataFrame(test_split[0]))
+    print()
+    print()
+    print(pd.DataFrame(test_split[1]))
 
+# classifyCART('train.txt', 'test.txt')
 
 def main():
     """This portion of the program will run when run only when main() is called.
@@ -247,6 +289,9 @@ def main():
     This way, when you <import HW2>, no code is run - only the functions you
     explicitly call.
     """
+    classifyIG('train.txt', 'test.txt')
+    classifyG('train.txt', 'test.txt')
+    classifyCART('train.txt', 'test.txt')
 
 
 if __name__ == "__main__":
