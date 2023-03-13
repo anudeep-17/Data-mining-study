@@ -209,7 +209,7 @@ def load(filename):
     return (data, best_IG, best_GINI, best_CART)
 
 #testing
-# load('train.txt')
+# load('test.txt')
 
 best_IG_fortrain = load('train.txt')
 
@@ -292,11 +292,36 @@ def main():
     classifyIG('train.txt', 'test.txt')
     classifyG('train.txt', 'test.txt')
     classifyCART('train.txt', 'test.txt')
-
+    print()
+    print()
+    print()
+    print()
+    print("-------test original classification---------------")
+    OG_test = load("test.txt")
+    print("----------------IG based split -----------------")
+    IGsplit = splitter(OG_test[0], OG_test[1][0],OG_test[1][1])
+    print(pd.DataFrame(IGsplit[0]))
+    print()
+    print()
+    print(pd.DataFrame(IGsplit[1]))
+    print()
+    print("----------------Gini based split -----------------")
+    Gsplit = splitter(OG_test[0], OG_test[2][0], OG_test[2][1])
+    print(pd.DataFrame(Gsplit[0]))
+    print()
+    print()
+    print(pd.DataFrame(Gsplit[1]))
+    print()
+    print("----------------CART based split -----------------")
+    Gsplit = splitter(OG_test[0], OG_test[3][0], OG_test[3][1])
+    print(pd.DataFrame(Gsplit[0]))
+    print()
+    print()
+    print(pd.DataFrame(Gsplit[1]))
 
 if __name__ == "__main__":
-    """__name__=="__main__" when the python script is run directly, not when it 
-    is imported. When this program is run from the command line (or an IDE), the 
+    """__name__=="__main__" when the python script is run directly, not when it
+    is imported. When this program is run from the command line (or an IDE), the
     following will happen; if you <import HW2>, nothing happens unless you call
     a function.
     """
