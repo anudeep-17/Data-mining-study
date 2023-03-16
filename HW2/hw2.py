@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pandas as pd
 
-# data = np.genfromtxt('t.txt', dtype=int, encoding=None,delimiter=",")
+data = pd.read_csv('train.txt', header=None)
 
 #helper methods:
 def splitter(D, index, value):
@@ -24,6 +24,7 @@ def wholeset_entropy(D, index):
     D_n = []
     # print(len(D[index]))
     for i in range(len(D[index])):
+        # print(D[index][i])
         if (D[10][i] == 1):
             D_y.append(D[index][i])
         else:
@@ -50,24 +51,24 @@ def wholeset_entropy(D, index):
 def IG(D, index, value):
     """Compute the Information Gain of a split on attribute index at value
     for dataset D.
-
     Args:
         D: a dataset, tuple (X, y) where X is the data, y the classes
         index: the index of the attribute (column of X) to split on
         value: value of the attribute at index to split at
-
     Returns:
         The value of the Information Gain for the given split
     """
-    D_y = splitter(D,index, value)[0]
-    D_n = splitter(D,index, value)[1]
+    data = pd.concat((D[0], D[1]), axis=1)
+    # print(data)
+    D_y = splitter(data,index, value)[0]
+    D_n = splitter(data,index, value)[1]
     # print(len(D_y), len(D_n))
     # print("after split: D_y -- \n", pd.DataFrame(splitter(D,index, value)[0]))
     # print()
     # print("after split: D_n -- \n", pd.DataFrame(splitter(D,index, value)[1]))
 
-    entropy_divide = (len(D_y)/len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[0] + (len(D_n)/len(D))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[0]
-    IG = wholeset_entropy(D, index)[0] - entropy_divide
+    entropy_divide = (len(D_y)/len(data)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[0] + (len(D_n)/len(data))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[0]
+    IG = wholeset_entropy(data, index)[0] - entropy_divide
     # print(entropy_divide)
     # print("found information gain: ", IG)
     return IG
@@ -78,26 +79,26 @@ def IG(D, index, value):
 def G(D, index, value):
     """Compute the Gini index of a split on attribute index at value
     for dataset D.
-
     Args:
         D: a dataset, tuple (X, y) where X is the data, y the classes
         index: the index of the attribute (column of X) to split on
         value: value of the attribute at index to split at
-
     Returns:
         The value of the Gini index for the given split
     """
-    D_y = splitter(D, index, value)[0]
-    D_n = splitter(D, index, value)[1]
+    data = pd.concat((D[0], D[1]), axis=1)
+
+    D_y = splitter(data, index, value)[0]
+    D_n = splitter(data, index, value)[1]
 
     if len(D_y) != 0 and len(D_n) != 0:
-        gini_index = (len(D_y) / len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True), index)[1] + (len(D_n) / len(D)) * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True), index)[1]
+        gini_index = (len(D_y) / len(data)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True), index)[1] + (len(D_n) / len(data)) * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True), index)[1]
 
     elif len(D_y) != 0 and len(D_n) == 0:
-        gini_index = (len(D_y) / len(D)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True), index)[1]
+        gini_index = (len(D_y) / len(data)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True), index)[1]
 
     elif len(D_y) == 0 and len(D_n) != 0:
-        gini_index = (len(D_n) / len(D)) * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True), index)[1]
+        gini_index = (len(D_n) / len(data)) * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True), index)[1]
 
     # print("calculated gini index: ", gini_index)
     return gini_index
@@ -109,19 +110,20 @@ def G(D, index, value):
 def CART(D, index, value):
     """Compute the CART measure of a split on attribute index at value
     for dataset D.
-
     Args:
         D: a dataset, tuple (X, y) where X is the data, y the classes
         index: the index of the attribute (column of X) to split on
         value: value of the attribute at index to split at
-
     Returns:
         The value of the CART measure for the given split
     """
-    D_y = splitter(D,index,value)[0]
-    D_n = splitter(D,index,value)[1]
+
+    data = pd.concat((D[0], D[1]), axis=1)
+
+    D_y = splitter(data,index,value)[0]
+    D_n = splitter(data,index,value)[1]
     # print(len(D_y), len(D_n))
-    cart = 2 * (len(D_y)/len(D)) * (len(D_n)/len(D)) * (wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[2] + wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[2])
+    cart = 2 * (len(D_y)/len(data)) * (len(D_n)/len(data)) * (wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[2] + wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[2])
     # print("Cart measure: ", cart)
     return cart
 
@@ -130,23 +132,23 @@ def CART(D, index, value):
 
 def bestSplit(D, criterion):
     """Computes the best split for dataset D using the specified criterion
-
     Args:
         D: A dataset, tuple (X, y) where X is the data, y the classes
         criterion: one of "IG", "GINI", "CART"
-
     Returns:
         A tuple (i, value) where i is the index of the attribute to split at value
     """
+
+
     correspondingsplits = {}
 
     if(criterion.upper() == "IG"):
         print('chosen : IG')
         print()
-        for i in D.columns[:10]:
-            uniques = D[i].unique()
+        for i in D[0].columns[:10]:
+            uniques = D[0][i].unique()
             for j in uniques:
-                correspondingsplits[IG(D, i, j)] = (i,j)
+                correspondingsplits[IG((D[0], D[1]), i, j)] = (i,j)
         print("largest Information gain found: " , max(correspondingsplits), "with the attribute and value being", correspondingsplits.get(max(correspondingsplits)))
         return correspondingsplits.get(max(correspondingsplits))
 
@@ -155,11 +157,11 @@ def bestSplit(D, criterion):
         print('chosen : GINI')
         print()
 
-        for i in D.columns[:10]:
-            uniques = D[i].unique()
+        for i in D[0].columns:
+            uniques = D[0][i].unique()
             # print(uniques)
             for j in uniques:
-                correspondingsplits[G(D, i, j)] = (i,j)
+                correspondingsplits[G((D[0], D[1]), i, j)] = (i,j)
         print("smallest GINI found: ", min(correspondingsplits), "with the attribute and value being", correspondingsplits.get(min(correspondingsplits)))
         return correspondingsplits.get(min(correspondingsplits))
 
@@ -168,10 +170,10 @@ def bestSplit(D, criterion):
         print('chosen: CART')
         print()
 
-        for i in D.columns[:10]:
-            uniques = D[i].unique()
+        for i in D[0].columns:
+            uniques = D[0][i].unique()
             for j in uniques:
-                correspondingsplits[CART(D, i, j)] = (i,j)
+                correspondingsplits[CART((D[0], D[1]), i, j)] = (i,j)
         print("largest CART found: ", max(correspondingsplits), "with the attribute and value being", correspondingsplits.get(max(correspondingsplits)))
         return correspondingsplits.get(max(correspondingsplits))
     else:
@@ -185,10 +187,8 @@ def bestSplit(D, criterion):
 def load(filename):
     """Loads filename as a dataset. Assumes the last column is classes, and
     observations are organized as rows.
-
     Args:
         filename: file to read
-
     Returns:
         A tuple D=(X,y), where X is a list or numpy ndarray of observation attributes
         where X[i] comes from the i-th row in filename; y is a list or ndarray of
@@ -196,31 +196,33 @@ def load(filename):
     """
     data = pd.read_csv(filename, header=None)
     print("whole data: \n", data)
-    print()
+    X = data.iloc[: , :len(data.columns)-1]
+    Y = data.iloc[: ,len(data.columns)-1:len(data.columns)]
+
     # print(CART(data,0,1))
-    best_IG = bestSplit(data, "IG")
-    best_GINI = bestSplit(data, "GINI")
-    best_CART = bestSplit(data, "CART")
-    print()
+
+    best_IG = bestSplit((X,Y), "IG")
+    best_GINI = bestSplit((X,Y), "GINI")
+    best_CART = bestSplit((X,Y), "CART")
+
+    # print()
     print("---------overall info----------")
     print("best IG at : ", best_IG)
     print("best GINI at : ", best_GINI)
     print("best CART at : ", best_CART)
-    return (data, best_IG, best_GINI, best_CART)
+    return ((X,Y), best_IG, best_GINI, best_CART)
 
 #testing
-# load('test.txt')
+load('train.txt')
 
 best_IG_fortrain = load('train.txt')
-
+#
 def classifyIG(train, test):
     """Builds a single-split decision tree using the Information Gain criterion
     and dataset train, and returns a list of predicted classes for dataset test
-
     Args:
         train: a tuple (X, y), where X is the data, y the classes
         test: the test set, same format as train
-
     Returns:
         A list of predicted classes for observations in test (in order)
     """
@@ -240,11 +242,9 @@ def classifyIG(train, test):
 def classifyG(train, test):
     """Builds a single-split decision tree using the GINI criterion
     and dataset train, and returns a list of predicted classes for dataset test
-
     Args:
         train: a tuple (X, y), where X is the data, y the classes
         test: the test set, same format as train
-
     Returns:
         A list of predicted classes for observations in test (in order)
     """
@@ -262,11 +262,9 @@ def classifyG(train, test):
 def classifyCART(train, test):
     """Builds a single-split decision tree using the CART criterion
     and dataset train, and returns a list of predicted classes for dataset test
-
     Args:
         train: a tuple (X, y), where X is the data, y the classes
         test: the test set, same format as train
-
     Returns:
         A list of predicted classes for observations in test (in order)
     """
@@ -293,31 +291,6 @@ def main():
     classifyG('train.txt', 'test.txt')
     classifyCART('train.txt', 'test.txt')
     print()
-    print()
-    print()
-    print()
-    print("-------test original classification---------------")
-    OG_test = load("test.txt")
-    print("----------------IG based split -----------------")
-    IGsplit = splitter(OG_test[0], OG_test[1][0],OG_test[1][1])
-    print(pd.DataFrame(IGsplit[0]))
-    print()
-    print()
-    print(pd.DataFrame(IGsplit[1]))
-    print()
-    print("----------------Gini based split -----------------")
-    Gsplit = splitter(OG_test[0], OG_test[2][0], OG_test[2][1])
-    print(pd.DataFrame(Gsplit[0]))
-    print()
-    print()
-    print(pd.DataFrame(Gsplit[1]))
-    print()
-    print("----------------CART based split -----------------")
-    Gsplit = splitter(OG_test[0], OG_test[3][0], OG_test[3][1])
-    print(pd.DataFrame(Gsplit[0]))
-    print()
-    print()
-    print(pd.DataFrame(Gsplit[1]))
 
 if __name__ == "__main__":
     """__name__=="__main__" when the python script is run directly, not when it
