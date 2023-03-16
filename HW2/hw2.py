@@ -16,6 +16,13 @@ def splitter(D, index, value):
             D_n.append(D.iloc[i])
     return (D_y, D_n)
 
+def error_index(data, true_class):
+    check = float(true_class)
+    if data[len(data.columns)-1].value_counts()[check] == len(data):
+        return 0
+    else:
+        return len(data) - data[len(data.columns)-1].value_counts()[check]
+
 def wholeset_entropy(D, index):
     if len(D) == 0:
         return (0,0,0)
@@ -45,7 +52,13 @@ def wholeset_entropy(D, index):
     prob_difference = math.fabs(((len(D_y) / len(D))) - ((len(D_n) / len(D))))
     # print(prob_difference)
 
-    return (whole_set_entropy,Gini_index, prob_difference)
+    if max(len(D_y)/len(D), len(D_n)/len(D)) == len(D_y)/len(D):
+        # print(len(D_y)/len(D),len(D_n)/len(D))
+        purityindex = 1
+    else:
+        purityindex = 0
+
+    return (whole_set_entropy,Gini_index, prob_difference, purityindex)
 
 #given methods
 def IG(D, index, value):
@@ -62,10 +75,6 @@ def IG(D, index, value):
     # print(data)
     D_y = splitter(data,index, value)[0]
     D_n = splitter(data,index, value)[1]
-    # print(len(D_y), len(D_n))
-    # print("after split: D_y -- \n", pd.DataFrame(splitter(D,index, value)[0]))
-    # print()
-    # print("after split: D_n -- \n", pd.DataFrame(splitter(D,index, value)[1]))
 
     entropy_divide = (len(D_y)/len(data)) * wholeset_entropy(pd.DataFrame(D_y).reset_index(drop=True),index)[0] + (len(D_n)/len(data))  * wholeset_entropy(pd.DataFrame(D_n).reset_index(drop=True),index)[0]
     IG = wholeset_entropy(data, index)[0] - entropy_divide
@@ -138,7 +147,6 @@ def bestSplit(D, criterion):
     Returns:
         A tuple (i, value) where i is the index of the attribute to split at value
     """
-
 
     correspondingsplits = {}
 
@@ -213,7 +221,7 @@ def load(filename):
     return ((X,Y), best_IG, best_GINI, best_CART)
 
 #testing
-load('train.txt')
+# load('train.txt')
 
 best_IG_fortrain = load('train.txt')
 #
@@ -228,14 +236,22 @@ def classifyIG(train, test):
     """
     data = pd.read_csv(test, header=None)
     # print(best_IG_fortrain[1])
+    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0],best_IG_fortrain[0][1]), axis = 1), best_IG_fortrain[1][0], best_IG_fortrain[1][1])[0]).reset_index(drop = True),best_IG_fortrain[1][0])[3]
+    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0],best_IG_fortrain[0][1]), axis = 1), best_IG_fortrain[1][0], best_IG_fortrain[1][1])[1]).reset_index(drop = True),best_IG_fortrain[1][0])[3]
+
     test_split = splitter(data, best_IG_fortrain[1][0], best_IG_fortrain[1][1])
     print()
     print("-------------------classification of IG------------------")
-    print(pd.DataFrame(test_split[0]))
+    print("predicted class: ", purityindex_D_y)
     print()
+    print(pd.DataFrame(test_split[0]))
+    print("classification error: ", error_index(pd.DataFrame(test_split[0]), purityindex_D_y))
+    print()
+    print("predicted class: ", purityindex_D_n)
     print()
     print(pd.DataFrame(test_split[1]))
-    # return
+    print("classification error: ", error_index(pd.DataFrame(test_split[1]), purityindex_D_n))
+
 
 # classifyIG('train.txt', 'test.txt')
 
@@ -249,13 +265,22 @@ def classifyG(train, test):
         A list of predicted classes for observations in test (in order)
     """
     data = pd.read_csv(test, header=None)
+
+    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0], best_IG_fortrain[0][1]), axis=1), best_IG_fortrain[2][0],best_IG_fortrain[2][1])[0]).reset_index(drop = True), best_IG_fortrain[2][0])[3]
+    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0], best_IG_fortrain[0][1]), axis=1), best_IG_fortrain[2][0],best_IG_fortrain[2][1])[1]).reset_index(drop = True), best_IG_fortrain[2][0])[3]
+
     test_split = splitter(data, best_IG_fortrain[2][0], best_IG_fortrain[2][1])
     print()
     print("-------------------classification of G------------------")
-    print(pd.DataFrame(test_split[0]))
+    print("predicted class: ", purityindex_D_y)
     print()
+    print(pd.DataFrame(test_split[0]))
+    print("classification error: ", error_index(pd.DataFrame(test_split[0]), purityindex_D_y))
+    print()
+    print("predicted class: ", purityindex_D_n)
     print()
     print(pd.DataFrame(test_split[1]))
+    print("classification error: ", error_index(pd.DataFrame(test_split[1]), purityindex_D_n))
 
 # classifyG('train.txt', 'test.txt')
 
@@ -270,13 +295,22 @@ def classifyCART(train, test):
     """
     data = pd.read_csv(test, header=None)
     # print(best_IG_fortrain[1])
+
+    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0], best_IG_fortrain[0][1]), axis=1), best_IG_fortrain[3][0],best_IG_fortrain[3][1])[0]).reset_index(drop=True), best_IG_fortrain[2][0])[3]
+    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0], best_IG_fortrain[0][1]), axis=1), best_IG_fortrain[3][0],best_IG_fortrain[3][1])[1]).reset_index(drop=True), best_IG_fortrain[2][0])[3]
+
     test_split = splitter(data, best_IG_fortrain[3][0], best_IG_fortrain[3][1])
     print()
     print("-------------------classification of CART------------------")
-    print(pd.DataFrame(test_split[0]))
+    print("predicted class: ", purityindex_D_y)
     print()
+    print(pd.DataFrame(test_split[0]))
+    print("classification error: ", error_index(pd.DataFrame(test_split[0]), purityindex_D_y))
+    print()
+    print("predicted class: ", purityindex_D_n)
     print()
     print(pd.DataFrame(test_split[1]))
+    print("classification error: ", error_index(pd.DataFrame(test_split[1]), purityindex_D_n))
 
 # classifyCART('train.txt', 'test.txt')
 
