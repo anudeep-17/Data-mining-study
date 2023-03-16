@@ -225,7 +225,7 @@ def load(filename):
 #testing
 # load('train.txt')
 
-best_IG_fortrain = load('train.txt')
+# best_IG_fortrain = load('train.txt')
 #
 def classifyIG(train, test):
     """Builds a single-split decision tree using the Information Gain criterion
@@ -237,11 +237,12 @@ def classifyIG(train, test):
         A list of predicted classes for observations in test (in order)
     """
     data = pd.read_csv(test, header=None)
-    # print(best_IG_fortrain[1])
-    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0],best_IG_fortrain[0][1]), axis = 1), best_IG_fortrain[1][0], best_IG_fortrain[1][1])[0]).reset_index(drop = True),best_IG_fortrain[1][0])[3]
-    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0],best_IG_fortrain[0][1]), axis = 1), best_IG_fortrain[1][0], best_IG_fortrain[1][1])[1]).reset_index(drop = True),best_IG_fortrain[1][0])[3]
 
-    test_split = splitter(data, best_IG_fortrain[1][0], best_IG_fortrain[1][1])
+    # print(best_IG_fortrain[1])
+    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((train[0][0],train[0][1]), axis = 1), train[1][0], train[1][1])[0]).reset_index(drop = True), train[1][0])[3]
+    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((train[0][0],train[0][1]), axis = 1), train[1][0], train[1][1])[1]).reset_index(drop = True), train[1][0])[3]
+
+    test_split = splitter(data, train[1][0], train[1][1])
     print()
     print("-------------------classification of IG------------------")
     print("predicted class: ", purityindex_D_y)
@@ -268,10 +269,10 @@ def classifyG(train, test):
     """
     data = pd.read_csv(test, header=None)
 
-    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0], best_IG_fortrain[0][1]), axis=1), best_IG_fortrain[2][0],best_IG_fortrain[2][1])[0]).reset_index(drop = True), best_IG_fortrain[2][0])[3]
-    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0], best_IG_fortrain[0][1]), axis=1), best_IG_fortrain[2][0],best_IG_fortrain[2][1])[1]).reset_index(drop = True), best_IG_fortrain[2][0])[3]
+    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((train[0][0], train[0][1]), axis=1), train[2][0], train[2][1])[0]).reset_index(drop = True), train[2][0])[3]
+    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((train[0][0], train[0][1]), axis=1), train[2][0], train[2][1])[1]).reset_index(drop = True), train[2][0])[3]
 
-    test_split = splitter(data, best_IG_fortrain[2][0], best_IG_fortrain[2][1])
+    test_split = splitter(data, train[2][0], train[2][1])
     print()
     print("-------------------classification of G------------------")
     print("predicted class: ", purityindex_D_y)
@@ -298,10 +299,10 @@ def classifyCART(train, test):
     data = pd.read_csv(test, header=None)
     # print(best_IG_fortrain[1])
 
-    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0], best_IG_fortrain[0][1]), axis=1), best_IG_fortrain[3][0],best_IG_fortrain[3][1])[0]).reset_index(drop=True), best_IG_fortrain[2][0])[3]
-    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((best_IG_fortrain[0][0], best_IG_fortrain[0][1]), axis=1), best_IG_fortrain[3][0],best_IG_fortrain[3][1])[1]).reset_index(drop=True), best_IG_fortrain[2][0])[3]
+    purityindex_D_y = wholeset_entropy(pd.DataFrame(splitter(pd.concat((train[0][0], train[0][1]), axis=1), train[3][0], train[3][1])[0]).reset_index(drop=True), train[2][0])[3]
+    purityindex_D_n = wholeset_entropy(pd.DataFrame(splitter(pd.concat((train[0][0], train[0][1]), axis=1), train[3][0], train[3][1])[1]).reset_index(drop=True), train[2][0])[3]
 
-    test_split = splitter(data, best_IG_fortrain[3][0], best_IG_fortrain[3][1])
+    test_split = splitter(data, train[3][0], train[3][1])
     print()
     print("-------------------classification of CART------------------")
     print("predicted class: ", purityindex_D_y)
@@ -323,9 +324,10 @@ def main():
     This way, when you <import HW2>, no code is run - only the functions you
     explicitly call.
     """
-    classifyIG('train.txt', 'test.txt')
-    classifyG('train.txt', 'test.txt')
-    classifyCART('train.txt', 'test.txt')
+    train_data = load('train.txt')
+    classifyIG(train_data, 'test.txt')
+    classifyG(train_data , 'test.txt')
+    classifyCART(train_data , 'test.txt')
     print()
 
 if __name__ == "__main__":
