@@ -60,6 +60,8 @@ def wholeset_entropy(D, index):
 
     return (whole_set_entropy,Gini_index, prob_difference, purityindex)
 
+
+
 #given methods
 def IG(D, index, value):
     """Compute the Information Gain of a split on attribute index at value
