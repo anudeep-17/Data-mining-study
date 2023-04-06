@@ -4,8 +4,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
+from sklearn.metrics import precision_score
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
+from sklearn.metrics import recall_score
+
 import random
 import numpy as np
 
@@ -52,86 +55,44 @@ class decisiontree:
         y = data[30].values
         print(y)
         return (X,y)
-    def calc(self, X, y, type = 'Train', testX = test_X, testy = test_y):
-        if (type == "Train"):
-            print("----------------testing on split data for this ------------")
-            print()
-        else:
-            print("------------------test data passed-----------------")
-            print()
+    def calc(self, X, y):
 
         for train_index, test_index in decisiontree.kf.split(X):
             X_train, X_test, y_train, y_test = X[train_index], X[test_index], y[train_index], y[test_index]
 
             DT_gini = DecisionTreeClassifier(criterion="gini", splitter="best", max_leaf_nodes=2, random_state=42)
             DT_IG = DecisionTreeClassifier(criterion="entropy", splitter="best", max_leaf_nodes=2, random_state=42)
-
-            if (type == "Train"):
-                DT_gini.fit(X_train, y_train)
-                DT_IG.fit(X_train, y_train)
-                y_predict_gini = DT_gini.predict(X_test)
-                y_predict_IG = DT_IG.predict(X_test)
-            else:
-                DT_gini.fit(X_train + X_test, y_train + y_test)
-                DT_IG.fit(X_train + X_test, y_train + y_test)
-                y_predict_gini = DT_gini.predict(testX)
-                y_predict_IG = DT_IG.predict(testX)
-                y_test = testy
-
+            DT_gini.fit(X_train, y_train)
+            DT_IG.fit(X_train, y_train)
+            y_predict_gini = DT_gini.predict(X_test)
+            y_predict_IG = DT_IG.predict(X_test)
             decisiontree.f1_data1_gini.append(f1_score(y_test, y_predict_gini, average='weighted'))
             decisiontree.f1_data1_IG.append(f1_score(y_test, y_predict_IG, average='weighted'))
 
             DT_gini = DecisionTreeClassifier(criterion="gini", splitter="best", max_leaf_nodes=5, random_state=42)
             DT_IG = DecisionTreeClassifier(criterion="entropy", splitter="best", max_leaf_nodes=5, random_state=42)
-
-            if (type == "Train"):
-                DT_gini.fit(X_train, y_train)
-                DT_IG.fit(X_train, y_train)
-                y_predict_gini = DT_gini.predict(X_test)
-                y_predict_IG = DT_IG.predict(X_test)
-            else:
-                DT_gini.fit(X_train + X_test, y_train + y_test)
-                DT_IG.fit(X_train + X_test, y_train + y_test)
-                y_predict_gini = DT_gini.predict(testX)
-                y_predict_IG = DT_IG.predict(testX)
-                y_test = testy
-
+            DT_gini.fit(X_train, y_train)
+            DT_IG.fit(X_train, y_train)
+            y_predict_gini = DT_gini.predict(X_test)
+            y_predict_IG = DT_IG.predict(X_test)
             decisiontree.f1_data2_gini.append(f1_score(y_test, y_predict_gini, average='weighted'))
             decisiontree.f1_data2_IG.append(f1_score(y_test, y_predict_IG, average='weighted'))
 
             DT_gini = DecisionTreeClassifier(criterion="gini", splitter="best", max_leaf_nodes=10, random_state=42)
             DT_IG = DecisionTreeClassifier(criterion="entropy", splitter="best", max_leaf_nodes=10, random_state=42)
-
-            if (type == "Train"):
-                DT_gini.fit(X_train, y_train)
-                DT_IG.fit(X_train, y_train)
-                y_predict_gini = DT_gini.predict(X_test)
-                y_predict_IG = DT_IG.predict(X_test)
-            else:
-                DT_gini.fit(X_train + X_test, y_train + y_test)
-                DT_IG.fit(X_train + X_test, y_train + y_test)
-                y_predict_gini = DT_gini.predict(testX)
-                y_predict_IG = DT_IG.predict(testX)
-                y_test = testy
-
+            DT_gini.fit(X_train, y_train)
+            DT_IG.fit(X_train, y_train)
+            y_predict_gini = DT_gini.predict(X_test)
+            y_predict_IG = DT_IG.predict(X_test)
             decisiontree.f1_data3_gini.append(f1_score(y_test, y_predict_gini, average='weighted'))
             decisiontree.f1_data3_IG.append(f1_score(y_test, y_predict_IG, average='weighted'))
 
             DT_gini = DecisionTreeClassifier(criterion="gini", splitter="best", max_leaf_nodes=20, random_state=42)
             DT_IG = DecisionTreeClassifier(criterion="entropy", splitter="best", max_leaf_nodes=20, random_state=42)
-
-            if (type == "Train"):
-                DT_gini.fit(X_train, y_train)
-                DT_IG.fit(X_train, y_train)
-                y_predict_gini = DT_gini.predict(X_test)
-                y_predict_IG = DT_IG.predict(X_test)
-            else:
-                DT_gini.fit(X_train + X_test, y_train + y_test)
-                DT_IG.fit(X_train + X_test, y_train + y_test)
-                y_predict_gini = DT_gini.predict(testX)
-                y_predict_IG = DT_IG.predict(testX)
-                y_test = testy
-
+            DT_gini.fit(X_train, y_train)
+            DT_IG.fit(X_train, y_train)
+            y_predict_gini = DT_gini.predict(X_test)
+            y_predict_IG = DT_IG.predict(X_test)
             decisiontree.f1_data4_gini.append(f1_score(y_test, y_predict_gini, average='weighted'))
             decisiontree.f1_data4_IG.append(f1_score(y_test, y_predict_IG, average='weighted'))
 
@@ -176,8 +137,13 @@ class decisiontree:
         print("------------testing of the trained model started--------")
         decisiontree.test_X = self.datasplitter(testdataset)[0]
         decisiontree.test_y = self.datasplitter(testdataset)[1]
-        self.calc(decisiontree.X, decisiontree.y, type="test", testX =  decisiontree.test_X,testy=decisiontree.test_y)
-        self.plotter()
-
+        X = [2,5,10,20]
+        Best_criterion_gini = decisiontree.f_data_gini.index(max(decisiontree.f_data_gini))
+        Best_criterion_IG = decisiontree.f_data_gini.index(max(decisiontree.f_data_IG))
+        DT_gini = DecisionTreeClassifier(criterion="gini", splitter="best", max_leaf_nodes=X[Best_criterion_gini], random_state=42)
+        DT_IG = DecisionTreeClassifier(criterion="entropy", splitter="best", max_leaf_nodes=X[Best_criterion_IG], random_state=42)
+        y_predict_gini = DT_gini.predict(decisiontree.test_X)
+        y_predict_IG = DT_IG.predict(decisiontree.test_X)
+        return ((precision_score(decisiontree.test_y, y_predict_gini),recall_score(decisiontree.test_y, y_predict_gini) ,f1_score(decisiontree.test_y, y_predict_gini, average='weighted')), (precision_score(decisiontree.test_y, y_predict_IG),recall_score(decisiontree.test_y, y_predict_IG) ,f1_score(decisiontree.test_y, y_predict_IG, average='weighted')))
 
 # decisiontreetest = decisiontree("cancer-data-train.csv")
