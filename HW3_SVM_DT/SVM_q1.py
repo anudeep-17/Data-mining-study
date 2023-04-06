@@ -33,7 +33,7 @@ class SVM:
         print()
         SVM.X = self.datasplitter(dataset)[0]
         SVM.y = self.datasplitter(dataset)[1]
-        self.calc(SVM.X, SVM.y)
+        self.calc()
         self.plotter()
 
     def datasplitter(self, dataset):
@@ -54,8 +54,8 @@ class SVM:
     def calc(self):
         print('-------------c: 1--------------------')
 
-        for train_index, test_index in SVM.kf.split(X):
-            X_train, X_test, y_train, y_test = X[train_index], X[test_index], y[train_index], y[test_index]
+        for train_index, test_index in SVM.kf.split(SVM.X):
+            X_train, X_test, y_train, y_test = SVM.X[train_index], SVM.X[test_index], SVM.y[train_index], SVM.y[test_index]
             classifier = SVC(kernel="linear", C=1)
             classifier.fit(X_train, y_train)
             y_predict = classifier.predict(X_test)

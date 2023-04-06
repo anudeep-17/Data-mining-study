@@ -54,7 +54,7 @@ class decisiontree:
         data[30] = data[30].apply(np.int32)
         y = data[30].values
         print(y)
-        return (X,y)
+
     def calc(self, X, y):
 
         for train_index, test_index in decisiontree.kf.split(X):

@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3b103550-de2d-4047-a3ae-e5579b645865" name="Changes" comment="model trained and accuracy test on progress">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HW3_SVM_DT/Decisiontree.py" beforeDir="false" afterPath="$PROJECT_DIR$/HW3_SVM_DT/Decisiontree.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HW3_SVM_DT/LDA.py" beforeDir="false" afterPath="$PROJECT_DIR$/HW3_SVM_DT/LDA.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HW3_SVM_DT/SVM_q1.py" beforeDir="false" afterPath="$PROJECT_DIR$/HW3_SVM_DT/SVM_q1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
