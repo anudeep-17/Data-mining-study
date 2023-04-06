@@ -1,7 +1,7 @@
 import numpy as np
 
 # Scoring for classifiers
-from sklearn.metrics import f1_score, precision_score, confusion_matrix, recall_score
+from sklearn.metrics import f1_score, average_precision_score, confusion_matrix, recall_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import matplotlib.pyplot as plt
@@ -63,7 +63,7 @@ class LDA:
         classifier = LinearDiscriminantAnalysis()
         classifier.fit(LDA.X, LDA.y)
         y_predict = classifier.predict(LDA.test_X)
-        return (confusion_matrix(LDA.test_y, y_predict), precision_score(LDA.test_y, y_predict), recall_score(LDA.test_y, y_predict),
+        return (confusion_matrix(LDA.test_y, y_predict), average_precision_score(LDA.test_y, y_predict), recall_score(LDA.test_y, y_predict),
                 f1_score(LDA.test_y, y_predict, average='weighted'))
 
 # LDAtest = LDA("cancer-data-train.csv")

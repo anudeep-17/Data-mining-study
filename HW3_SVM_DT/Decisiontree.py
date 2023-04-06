@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import precision_score , confusion_matrix, f1_score, recall_score
+from sklearn.metrics import average_precision_score , confusion_matrix, f1_score, recall_score
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 
@@ -140,6 +140,6 @@ class decisiontree:
         DT_IG = DecisionTreeClassifier(criterion="entropy", splitter="best", max_leaf_nodes=X[Best_criterion_IG], random_state=42)
         y_predict_gini = DT_gini.predict(decisiontree.test_X)
         y_predict_IG = DT_IG.predict(decisiontree.test_X)
-        return ((confusion_matrix(decisiontree.test_y, y_predict_gini),precision_score(decisiontree.test_y, y_predict_gini),recall_score(decisiontree.test_y, y_predict_gini) ,f1_score(decisiontree.test_y, y_predict_gini, average='weighted')), (confusion_matrix(decisiontree.test_y, y_predict_IG),precision_score(decisiontree.test_y, y_predict_IG),recall_score(decisiontree.test_y, y_predict_IG) ,f1_score(decisiontree.test_y, y_predict_IG, average='weighted')))
+        return ((confusion_matrix(decisiontree.test_y, y_predict_gini),average_precision_score(decisiontree.test_y, y_predict_gini),recall_score(decisiontree.test_y, y_predict_gini) ,f1_score(decisiontree.test_y, y_predict_gini, average='weighted')), (confusion_matrix(decisiontree.test_y, y_predict_IG),precision_score(decisiontree.test_y, y_predict_IG),recall_score(decisiontree.test_y, y_predict_IG) ,f1_score(decisiontree.test_y, y_predict_IG, average='weighted')))
 
 # decisiontreetest = decisiontree("cancer-data-train.csv")

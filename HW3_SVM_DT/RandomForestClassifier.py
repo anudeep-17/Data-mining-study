@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
 # Scoring for classifiers
-from sklearn.metrics import accuracy_score, precision_score, confusion_matrix, recall_score, f1_score
+from sklearn.metrics import accuracy_score, average_precision_score, confusion_matrix, recall_score, f1_score
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 # SVM: linear and a kernel-SVM (you can read more about it in the SVM chapter)
@@ -23,23 +23,26 @@ class RFC:
     k = 10
     kf = KFold(n_splits=k)
 
-    def __init__(self):
+    def __init__(self, dataset):
         print("----------------Random Forest Classifier-------------------------")
-
+        print()
+        RFC.X = self.datasplitter(dataset)[0]
+        RFC.y = self.datasplitter(dataset)[1]
+        self.calc()
 
     def datasplitter(self, dataset):
-        data = pd.read_csv("cancer-data-train.csv", header=None)
-        print(data.iloc[:, :-1])
+        data = pd.read_csv(dataset, header=None)
+        # print(data.iloc[:, :-1])
         RFC.X = data.iloc[:, :-1]
         RFC.X =  RFC.X.to_numpy()
         RFC.X = StandardScaler().fit_transform(RFC.X)
-        print(RFC.X)
+        # print(RFC.X)
 
         data[30] = data[30].replace("M", 1)
         data[30] = data[30].replace("B", 0)
         data[30] = data[30].apply(np.int32)
         RFC.y = data[30].values
-        print(RFC.y)
+        # print(RFC.y)
         return (RFC.X,RFC.y)
 
     def calc(self):
@@ -57,7 +60,7 @@ class RFC:
         print("------------testing of the trained model started--------")
         RFC.test_X = self.datasplitter(testdataset)[0]
         RFC.test_y = self.datasplitter(testdataset)[1]
-        classifier = RandomForestClassifier()
+        classifier = RandomForestClassifier(n_estimators=100)
         classifier.fit(RFC.X, RFC.y)
         y_predict = classifier.predict(RFC.test_X)
         return (confusion_matrix(RFC.test_y, y_predict), precision_score(RFC.test_y, y_predict),
