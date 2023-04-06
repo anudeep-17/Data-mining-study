@@ -1,13 +1,10 @@
 import numpy as np
 
 # Scoring for classifiers
-from sklearn.metrics import accuracy_score, precision_score
-from sklearn.metrics import average_precision_score
-
-from sklearn.metrics import recall_score
+from sklearn.metrics import accuracy_score, precision_score, confusion_matrix, recall_score, f1_score
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
-from sklearn.metrics import f1_score
+
 # SVM: linear and a kernel-SVM (you can read more about it in the SVM chapter)
 from sklearn.svm import SVC
 from sklearn.model_selection import KFold
@@ -118,4 +115,4 @@ class SVM:
         classifier = SVC(kernel="linear", C=X[Best_Cval])
         classifier.fit(SVM.X, SVM.y)
         y_predict = classifier.predict(SVM.test_X)
-        return (precision_score(SVM.test_y, y_predict), recall_score(SVM.test_y, y_predict) ,f1_score(SVM.test_y, y_predict, average='weighted'))
+        return (confusion_matrix(SVM.test_y, y_predict),precision_score(SVM.test_y, y_predict), recall_score(SVM.test_y, y_predict) ,f1_score(SVM.test_y, y_predict, average='weighted'))

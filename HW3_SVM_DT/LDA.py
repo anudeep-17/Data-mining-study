@@ -1,16 +1,10 @@
 import numpy as np
 
 # Scoring for classifiers
-from sklearn.metrics import accuracy_score, precision_score
-from sklearn.metrics import average_precision_score
-
-from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score, precision_score, confusion_matrix, recall_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import matplotlib.pyplot as plt
-from sklearn.metrics import f1_score
-# SVM: linear and a kernel-SVM (you can read more about it in the SVM chapter)
-from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 
 import pandas as pd
@@ -69,7 +63,7 @@ class LDA:
         classifier = LinearDiscriminantAnalysis()
         classifier.fit(LDA.X, LDA.y)
         y_predict = classifier.predict(LDA.test_X)
-        return (precision_score(LDA.test_y, y_predict), recall_score(LDA.test_y, y_predict),
+        return (confusion_matrix(LDA.test_y, y_predict), precision_score(LDA.test_y, y_predict), recall_score(LDA.test_y, y_predict),
                 f1_score(LDA.test_y, y_predict, average='weighted'))
 
 # LDAtest = LDA("cancer-data-train.csv")
