@@ -43,17 +43,17 @@ class SVM:
     def datasplitter(self, dataset):
         data = pd.read_csv(dataset, header=None)
         # print(data.iloc[:, :-1])
-        SVM.X = data.iloc[:, :-1]
-        SVM.X = SVM.X.to_numpy()
-        SVM.X = StandardScaler().fit_transform(SVM.X)
+        X = data.iloc[:, :-1]
+        X = X.to_numpy()
+        X = StandardScaler().fit_transform(X)
         # print(SVM.X)
 
         data[30] = data[30].replace("M", 1)
         data[30] = data[30].replace("B", 0)
         data[30] = data[30].apply(np.int32)
-        SVM.y = data[30].values
+        y = data[30].values
         # print(SVM.y)
-        return (SVM.X, SVM.y)
+        return (X,y)
 
     def calc(self):
         # print('-------------c: 1--------------------')
@@ -109,17 +109,20 @@ class SVM:
         print("------------averaged f1 score------------------------")
         print(SVM.f1_data)
         plt.plot(X, SVM.f1_data)
+        plt.xlabel("C values")
+        plt.ylabel("f1 scores")
+        plt.title("LDA")
         plt.tight_layout()
         plt.show()
 
     def testreport(self, testdataset):
-        print("------------testing of the trained model started--------")
+        # print("------------testing of the trained model started--------")
         SVM.test_X = self.datasplitter(testdataset)[0]
         SVM.test_y = self.datasplitter(testdataset)[1]
         X = [0.01,0.1,1,10,100]
         Best_Cval= SVM.f1_data.index(max(SVM.f1_data))
         classifier = SVC(kernel="linear", C=X[Best_Cval])
-        print(classifier)
+        # print(classifier)
         classifier.fit(SVM.X, SVM.y)
         y_predict = classifier.predict(SVM.test_X)
         return (confusion_matrix(SVM.test_y, y_predict),average_precision_score(SVM.test_y, y_predict), recall_score(SVM.test_y, y_predict, average="weighted") ,f1_score(SVM.test_y, y_predict, average='weighted'))
